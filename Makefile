@@ -1,4 +1,4 @@
-all: bulid-deps lustre-client-2.12.8-1.fsx5.el8.src.rpm
+all: build-deps lustre-client-2.12.8-1.fsx5.el8.src.rpm
 	rpmbuild --rebuild lustre-client-2.12.8-1.fsx5.el8.src.rpm
 
 lustre-client-2.12.8-1.fsx5.el8.src.rpm:
