@@ -23,7 +23,7 @@ spec:
     - type: "ImageChange"
   source:
     git:
-      ref: "master"
+      ref: "main"
       uri: "https://github.com/kincl/lustre-kmod-container.git"
     type: Git
   strategy:
