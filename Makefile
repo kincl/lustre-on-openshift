@@ -14,4 +14,4 @@ build-deps:
 	dnf install -y dnf-utils rpm-build libselinux-devel libtool libyaml-devel
 
 install:
-	dnf install /root/rpmbuild/RPMS/x86_64/kmod-lustre-client-2.12.8-1.fsx5.el8.x86_64.rpm /root/rpmbuild/RPMS/x86_64/lustre-client-2.12.8-1.fsx5.el8.x86_64.rpm
+	dnf install -y /root/rpmbuild/RPMS/x86_64/kmod-lustre-client-2.12.8-1.fsx5.el8.x86_64.rpm /root/rpmbuild/RPMS/x86_64/lustre-client-2.12.8-1.fsx5.el8.x86_64.rpm
