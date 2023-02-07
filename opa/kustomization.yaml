@@ -1,0 +1,12 @@
+namespace: opa
+
+configMapGenerator:
+- name: policy
+  files:
+  - main.rego
+  - mutation.rego
+
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    openpolicyagent.org/policy: rego

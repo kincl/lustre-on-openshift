@@ -1,0 +1,33 @@
+---
+entitlement needed until 4.11.z or 4.12.z release for rpm-build in DTK
+https://gist.github.com/kincl/7d720041d58f79a9725615c074a37d8c
+
+key=$(oc get secret -n openshift-config-managed etc-pki-entitlement -o=jsonpath='{.data.entitlement-key\.pem}') \
+cert=$(oc get secret -n openshift-config-managed etc-pki-entitlement -o=jsonpath='{.data.entitlement\.pem}') \
+envsubst < <(curl -sL https://gist.githubusercontent.com/kincl/7d720041d58f79a9725615c074a37d8c/raw/02-cluster-wide-machineconfig.template.yaml) \
+| oc create -f -
+
+---
+Kernel Module Management operator (pulling from midstream until deployed into catalogs)
+https://github.com/rh-ecosystem-edge/kernel-module-management/blob/main/docs/mkdocs/documentation/install.md
+
+oc apply -k https://github.com/rh-ecosystem-edge/kernel-module-management/config/default
+
+oc get nodes -o name | xargs -I{} oc label {} feature.kmm.lustre=true
+
+oc adm policy add-scc-to-user privileged -z default
+
+---
+running
+
+modprobe ksocklnd
+modprobe lustre
+modprobe mgc
+
+mkdir /fsx
+mount -t lustre -o noatime,flock fs-007c21146b144c629.fsx.us-east-2.amazonaws.com@tcp:/fsx /fsx
+
+---
+:( selinux not supported with lustre at all
+
+https://access.redhat.com/solutions/31981 

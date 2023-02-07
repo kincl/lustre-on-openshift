@@ -1,0 +1,13 @@
+resources:
+- kmm.yaml
+- machineconfig.yaml
+
+namespace: lustre
+
+configMapGenerator:
+- name: build-module
+  files:
+  - dockerfile=Dockerfile
+
+generatorOptions:
+  disableNameSuffixHash: true

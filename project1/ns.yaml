@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    runAsGroup: "100"
+    runAsUser: "1000"
+  labels:
+    openpolicyagent.org/webhook: "true"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: v1.24
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: v1.24
+  name: project1
+spec: {}

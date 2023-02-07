@@ -1,0 +1,15 @@
+---
+Install OPA + kube-mgmt
+
+helm repo add opa https://open-policy-agent.github.io/kube-mgmt/charts
+helm repo update
+helm inspect values opa/opa-kube-mgmt > values.yaml
+
+helm upgrade -i -n opa --create-namespace opa opa/opa-kube-mgmt --values opa/values.yaml
+oc apply -k opa/
+
+
+---
+set up project1
+
+oc apply -k project1/

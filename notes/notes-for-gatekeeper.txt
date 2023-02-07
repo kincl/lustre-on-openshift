@@ -1,0 +1,8 @@
+---
+not installing gatekeeper operator because its super old and tied directly to ACM?
+
+https://open-policy-agent.github.io/gatekeeper/website/docs/install/
+
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/master/deploy/gatekeeper.yaml
+
+gatekeeper does not have dynamic mutation capabilities
