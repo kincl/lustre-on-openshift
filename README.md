@@ -136,3 +136,18 @@ the OPA mutation to work.
 ```
 $ oc apply -k project1/
 ```
+
+## Drawings
+
+### Technologies Involved
+
+![technologies](img/technologies.jpg)
+
+### Node View
+
+![node-view](img/node-view2.jpg)
+
+
+### Request Flow
+
+![flow](img/flow.jpg)
