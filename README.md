@@ -96,7 +96,21 @@ Open Policy Agent is just one way of achieving this goal including others such a
 build a webhook receiver with the Kubernetes Golang scaffolding.
 
 One thing to note here is that misconfigured validating and mutating webhooks can severely impair your cluster so we
-take care to 
+take care to ensure that our blast radius is as tight as possible and encompasses only user workloads and not cluster-critical workloads:
+
+- Scope our webhook configuration to exactly what we need by setting the rule to only CREATE operations on namespace-scoped resources
+
+```
+  - operations: ["CREATE"]
+    apiGroups: ["*"]
+    apiVersions: ["*"]
+    resources: ["*"]
+    scope: "Namespaced"
+```
+- Set a namespace selector on our webhook configuration to only apply to namespaces with our label: `openpolicyagent.org/webhook=`
+- Set our webhook configuration to `failurePolicy: Fail` to ensure that we fail closed, user workloads will not be created if OPA is unable to handle requests 
+
+We also need to label all of our user namespaces so that our webhook enforces our changes.
 
 ### Install
 
