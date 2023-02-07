@@ -1,5 +1,4 @@
 FROM registry.redhat.io/openshift4/driver-toolkit-rhel8:v4.11 as builder
-#FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dcbd937278c7691d1221b344be2418b3db83a4b7622324b7a292e8d2a84346fd
 ARG KERNEL_VERSION=4.18.0-372.36.1.el8_6.x86_64
 ARG LUSTRE_VERSION=2.12.8
 
@@ -14,10 +13,6 @@ RUN curl https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-pub
 RUN yumdownloader --source lustre-client-${LUSTRE_VERSION} && \
     rpmbuild -v --rebuild lustre-client-*.src.rpm && \
     dnf install -y /root/rpmbuild/RPMS/x86_64/kmod-lustre-client-${LUSTRE_VERSION}*.el8.x86_64.rpm /root/rpmbuild/RPMS/x86_64/lustre-client-${LUSTRE_VERSION}*.el8.x86_64.rpm
-
-# RUN mkdir -p /opt/lib/modules/${KERNEL_VERSION} && \
-#     cp /build/kmm-kmod/*.ko /opt/lib/modules/${KERNEL_VERSION}/
-# RUN depmod -b /opt
 
 FROM registry.access.redhat.com/ubi8/ubi:latest
 ARG KERNEL_VERSION=4.18.0-372.36.1.el8_6.x86_64
