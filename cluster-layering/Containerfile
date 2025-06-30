@@ -1,0 +1,11 @@
+FROM driver-toolkit as build
+
+RUN dnf -y install libtool keyutils-libs-devel libmount-devel libnl3-devel
+
+RUN cd /tmp && \
+    git clone git://git.whamcloud.com/fs/lustre-release.git && \
+    cd lustre-release && \
+    git checkout b2_15 && \
+    sh autogen.sh && \
+    ./configure && \
+    make rpms
