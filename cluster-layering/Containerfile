@@ -9,3 +9,12 @@ RUN cd /tmp && \
     sh autogen.sh && \
     ./configure && \
     make rpms
+
+# this is for OCP 4.18.17 (oc adm release info --image-for rhel-coreos)
+FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5d72a2e81ac9a694c17a9464f754189d4632ffde5e59203a3a591e54fa7660e7
+
+COPY --from=build /tmp/lustre-release/*lustre-client-[0-9]*.rpm /tmp
+
+RUN rpm-ostree install /tmp/*lustre-client*rpm && \
+    rpm-ostree cleanup -m && \
+    ostree container commit
