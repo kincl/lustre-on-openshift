@@ -1,4 +1,4 @@
-FROM driver-toolkit as build
+FROM image-registry.openshift-image-registry.svc:5000/openshift/driver-toolkit as build
 
 RUN dnf -y install libtool keyutils-libs-devel libmount-devel libnl3-devel
 
