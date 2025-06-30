@@ -1,6 +1,6 @@
 FROM image-registry.openshift-image-registry.svc:5000/openshift/driver-toolkit as build
 
-RUN dnf --enablerepo=ubi-9-codeready-builder -y install libtool keyutils-libs-devel libmount-devel libnl3-devel libyaml-devel
+RUN dnf --enablerepo=ubi-9-codeready-builder -y install libtool keyutils-libs-devel libmount-devel libnl3-devel libyaml-devel kernel-abi-stablelists
 
 RUN cd /tmp && \
     git clone git://git.whamcloud.com/fs/lustre-release.git && \
