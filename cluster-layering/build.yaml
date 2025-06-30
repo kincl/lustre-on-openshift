@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lustre-build
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: use-share-etc-pki-entitlement
+  namespace: lustre-build
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -15,7 +21,8 @@ subjects:
 apiVersion: shipwright.io/v1beta1
 kind: Build
 metadata:
-  name: buildah-rhel
+  name: buildah-lustre-node-image
+  namespace: lustre-build
 spec:
   source:
     type: Git
@@ -36,4 +43,4 @@ spec:
         sharedSecret: etc-pki-entitlement
     name: etc-pki-entitlement
   output:
-    image: image-registry.openshift-image-registry.svc:5000/openshift/lustre-node-image
+    image: image-registry.openshift-image-registry.svc:5000/lustre-build/lustre-node-image
