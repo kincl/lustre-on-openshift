@@ -53,7 +53,7 @@ To mount the FSx Lustre filesystem:
    sudo mkdir -p /mnt/fsx
 
 3. Mount the filesystem:
-   sudo mount -t lustre ${aws_fsx_lustre_file_system.lustre.dns_name}@tcp:/${aws_fsx_lustre_file_system.lustre.mount_name} /mnt/fsx
+   sudo mount -t lustre -o relatime,flock ${aws_fsx_lustre_file_system.lustre.dns_name}@tcp:/${aws_fsx_lustre_file_system.lustre.mount_name} /mnt/fsx
 
 4. Verify the mount:
    df -h | grep fsx
