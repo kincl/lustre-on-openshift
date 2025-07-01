@@ -1,0 +1,8 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: os-layer-custom
+spec:
+  osImageURL: image-registry.openshift-image-registry.svc:5000/lustre-build/lustre-node-image@sha256:61b5fac1fc856bc7ad8b60300a5104295be929e4bf66fd0b446b52e4a433eade
