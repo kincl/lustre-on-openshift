@@ -10,6 +10,8 @@ There are two strategies for RHCOS layering:
 - **On-cluster layering**: The container image is built within the cluster (GA as of OCP 4.19)
 - **Out-of-cluster layering**: The container image is built externally and applied to the cluster
 
+On-cluster layering should be possible but I have not yet investigated it.
+
 This example uses **out-of-cluster layering**.
 
 ## Prerequisites
