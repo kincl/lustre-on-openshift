@@ -29,6 +29,50 @@ The KMM operator builds the kernel modules in a container and installs them in t
 
 **For the alternative KMM approach, see:** [kernel-module-management/](kernel-module-management/)
 
+## Test Lustre mounts on host
+
+```
+oc debug -t node/<node> -- chroot /host
+mount -t lustre mgs:/path /mnt/lustre
+```
+
+If there are issues mounting, the lnet setup may be wonky:
+
+```
+dmesg
+```
+```
+[56404.332675] Lustre: Lustre: Build Version: 2.15.7
+[56404.387135] LNet: 371570:0:(config.c:1530:lnet_inet_enumerate()) lnet: Ignoring interface ovs-system: it's down
+[56404.387317] LNet: Added LNI 10.131.0.2@tcp [8/256/0/180]
+[56404.387379] LNet: Accept secure, port 988
+```
+
+You may have to force lnet to br-ex interface:
+
+```
+echo "options lnet networks=tcp0(br-ex)" >> /etc/modprobe.d/lustre.conf
+```
+
+```
+lustre_rmmod
+modprobe lustre
+lnetctl net show
+```
+```
+net:
+    - net type: lo
+      local NI(s):
+        - nid: 0@lo
+          status: up
+    - net type: tcp
+      local NI(s):
+        - nid: 10.0.28.18@tcp
+          status: up
+          interfaces:
+              0: br-ex
+```
+
 ## Mutating Webhooks with Open Policy Agent
 
 To dynamically patch user workloads with the correct UIDs and volume mount information, we use [admission webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/). This allows us to access and modify each API request as it comes to Kubernetes.
