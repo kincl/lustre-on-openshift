@@ -28,7 +28,6 @@ spec:
     type: Git
     git:
       url: https://github.com/kincl/lustre-on-openshift.git
-      revision: testing-layering
     contextDir: cluster-layering
   strategy:
     name: buildah
