@@ -1,39 +1,47 @@
 # Lustre on OpenShift
 
-This shows how it is possible to mount Lustre (in this case AWS FSx Lustre) on
-OpenShift and use it similar to a HPC environment.
+This repository demonstrates how to mount Lustre (specifically AWS FSx Lustre) on OpenShift and utilize it similar to a traditional HPC environment.
 
-We will be:
+## Overview
 
-- Building the kernel modules using the Kubernetes Kernel Module Management operator
-and OpenShift's Driver Toolkit image
-- Mounting the Lustre filesystem on Red Hat CoreOS worker nodes in an OpenShift Cluster
-- Dynamically patching user workloads to bind mount Lustre into Pods with Open Policy Agent
+This solution enables:
 
-## Cluster Layering or KMM
+- Building Lustre kernel modules for Red Hat CoreOS (RHCOS) workers in OpenShift
+- Mounting Lustre filesystems on OpenShift worker nodes
+- Dynamically patching user workloads to bind mount Lustre into Pods using Open Policy Agent
 
-Cluster layering uses RHCOS layers to deploy the kernel modules for lustre client to the nodes in the node image itself. KMM operator builds the kernel modules in a container and installs them in the live kernel.
+## Kernel Module Deployment Approaches
 
-Cluster layering is preferred in this case.
+There are two approaches for deploying the Lustre client kernel modules:
 
-Look at either [cluster-layering/](cluster-layering/) or [kernel-module-management/](kernel-module-management/)
+### 1. Cluster Layering (Recommended)
+
+Cluster layering integrates the Lustre client kernel modules directly into the RHCOS node image itself. This method:
+- Provides better integration with OpenShift's lifecycle management
+- Offers improved stability and reliability
+- Is the officially recommended approach
+
+**To implement the cluster layering approach, see:** [cluster-layering/](cluster-layering/)
+
+### 2. Kernel Module Management (Alternative)
+
+The KMM operator builds the kernel modules in a container and installs them in the live kernel. While functional, this approach is provided as an alternative when cluster layering cannot be implemented.
+
+**For the alternative KMM approach, see:** [kernel-module-management/](kernel-module-management/)
 
 ## Mutating Webhooks with Open Policy Agent
 
-In order to dynamically patch user workloads with the correct UIDs and volume mount information
-we can use a built-in feature of the Kubernetes API server called [admission webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/).
-This let's us access each API request as it comes in to Kubernetes to either accept,
-modify, or reject the request.
+To dynamically patch user workloads with the correct UIDs and volume mount information, we use [admission webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/). This allows us to access and modify each API request as it comes to Kubernetes.
 
 ### Deploying Open Policy Agent and MutatingWebhookConfiguration
 
-Open Policy Agent is just one way of achieving this goal including others such as Kyverno or even the Operator-SDK to
-build a webhook receiver with the Kubernetes Golang scaffolding.
+Open Policy Agent (OPA) is one of several possible approaches for implementing admission webhooks, alongside alternatives like Kyverno or custom webhooks built with Operator-SDK.
 
-One thing to note here is that misconfigured validating and mutating webhooks can severely impair your cluster so we
-take care to ensure that our blast radius is as tight as possible and encompasses only user workloads and not cluster-critical workloads:
+#### Safety Considerations
 
-- Scope our webhook configuration to exactly what we need by setting the rule to only CREATE operations on namespace-scoped resources
+Misconfigured webhooks can severely impact cluster functionality, so we carefully limit the scope:
+
+- We restrict webhook rules to only CREATE operations on namespace-scoped resources:
 
 ```
   - operations: ["CREATE"]
@@ -42,12 +50,11 @@ take care to ensure that our blast radius is as tight as possible and encompasse
     resources: ["*"]
     scope: "Namespaced"
 ```
-- Set a namespace selector on our webhook configuration to only apply to namespaces with our label: `openpolicyagent.org/webhook=`
-- Set our webhook configuration to `failurePolicy: Fail` to ensure that we fail closed, user workloads will not be created if OPA is unable to handle requests
 
-We also need to label all of our user namespaces so that our webhook enforces our changes.
+- We use namespace selectors to apply webhooks only to namespaces with our label: `openpolicyagent.org/webhook=`
+- We set `failurePolicy: Fail` to ensure user workloads won't be created if OPA is unavailable (fail-closed approach)
 
-### Install
+### Installation
 
 Install OPA + kube-mgmt:
 
@@ -60,19 +67,17 @@ $ helm upgrade -i -n opa --create-namespace opa opa/opa-kube-mgmt --values opa/v
 $ oc apply -k opa/
 ```
 
-OPA uses a custom policy language called Rego (based loosely on datalog/prolog). We are deploying a ConfigMap with our
-policies for OPA to enforce.
+OPA uses Rego, a custom policy language (based loosely on datalog/prolog), which we deploy via ConfigMap to enforce our policies.
 
-## Testing it all out
+## Testing the Solution
 
-In order to test it all out I have a simple project namespace which has the correct annotations applied for enabling
-the OPA mutation to work.
+To test the complete solution, we've included a sample project namespace with the correct annotations for OPA mutation:
 
 ```
 $ oc apply -k project1/
 ```
 
-## Drawings
+## Architecture Diagrams
 
 ### Technologies Involved
 
@@ -81,7 +86,6 @@ $ oc apply -k project1/
 ### Node View
 
 ![node-view](img/node-view2.jpg)
-
 
 ### Request Flow
 
