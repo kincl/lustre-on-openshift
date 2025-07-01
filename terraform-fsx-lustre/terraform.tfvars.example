@@ -1,0 +1,20 @@
+# AWS Region
+region = "us-west-2"
+
+# Project name for resource tagging
+project_name = "fsx-lustre-demo"
+
+# VPC and Subnet Configuration
+vpc_cidr           = "10.0.0.0/16"
+subnet_cidr        = "10.0.1.0/24"
+availability_zone  = "us-west-2a"
+
+# FSx Lustre Configuration
+# Options for deployment_type: SCRATCH_1, SCRATCH_2, PERSISTENT_1, PERSISTENT_2
+fsx_deployment_type           = "SCRATCH_2"
+fsx_storage_capacity          = 1200  # Minimum 1200 GiB
+fsx_per_unit_storage_throughput = 50  # Only used for PERSISTENT deployment types
+
+# VPC Peering Configuration (Optional)
+# Uncomment and fill in this value to enable VPC peering
+# existing_vpc_id             = "vpc-12345678"
