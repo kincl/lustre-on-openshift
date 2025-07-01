@@ -1,0 +1,8 @@
+apiVersion: shipwright.io/v1beta1
+kind: BuildRun
+metadata:
+  generateName: buildah-lustre-node-image-
+  namespace: lustre-build
+spec:
+  build:
+    name: buildah-lustre-node-image
