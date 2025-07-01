@@ -121,7 +121,11 @@ To test the complete solution, we've included a sample project namespace with th
 $ oc apply -k project1/
 ```
 
-## Architecture Diagrams
+## Future work
+
+* Integration with https://github.com/HewlettPackard/lustre-csi-driver
+
+## slightly out of date Architecture Diagrams
 
 ### Technologies Involved
 
