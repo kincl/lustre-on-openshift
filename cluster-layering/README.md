@@ -1,45 +1,87 @@
-# Using Cluster Layering for RHCOS
+# Using Cluster Layering for Lustre on RHCOS
 
-This uses Red Hat CoreOS's layering to ship the lustre kernel modules to the host. [Read more about it.](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/machine_configuration/mco-coreos-layering)
+This guide demonstrates how to use Red Hat CoreOS (RHCOS) layering to deploy Lustre kernel modules to OpenShift Container Platform (OCP) hosts.
 
-There are two strategies, **on-cluster layering** and **out-of-cluster layering** which describe where the container image is built, on-cluster layering is GA as of OCP 4.19 and is brand new. This example uses out-of-cluster layering.
+## Overview
 
-## The Containerfile
+RHCOS layering is a mechanism that allows extending CoreOS functionality by installing additional packages. [Read more about CoreOS layering](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/machine_configuration/mco-coreos-layering).
 
-In order to build our RHCOS layer container image with Lustre, we need two specific images that are unique to the version of the cluster. These images must be pulled with a [OCP registry pull secret](https://console.redhat.com/openshift/install/pull-secret):
+There are two strategies for RHCOS layering:
+- **On-cluster layering**: The container image is built within the cluster (GA as of OCP 4.19)
+- **Out-of-cluster layering**: The container image is built externally and applied to the cluster
 
-- The driver-toolkit image (oc adm release info --image-for driver-toolkit)
-- The rhcos image (oc adm release info --image-for rhel-coreos)
+This example uses **out-of-cluster layering**.
 
-These plug into the [Containerfile](Containerfile), the driver-toolkit ships with RPMs like kernel-devel for the kernel in the rhel-coreos image.
+## Prerequisites
 
-The other requirement is that the container build will need to be entitled in order to access some of the build requirements we need access to the RHEL repos beyond what UBI gives us. This can be done on a subscribed RHEL host or in a OpenShift cluster. The next section will describe how we can use a OpenShift cluster to build the image.
+- OpenShift Container Platform cluster
+- `oc` command-line tool
+- [OCP registry pull secret](https://console.redhat.com/openshift/install/pull-secret)
+- RHEL entitlement (for accessing required repositories)
 
-## Building the container on a OpenShift Cluster
+## Building the RHCOS Layer Container Image
 
-Even though we are doing "out-of-cluster layering" we are still going to be building the container image in a cluster. The name is a bit of a misnomer and really means that the cluster (specifically the Machine Config Operator) will not do the image build and will expect a image that it can pull and apply to the nodes.
+### Required Base Images
 
-There is no requirement to use a OpenShift cluster to build, you can build the container image anywhere and host it on any docker v2 registry you want.
+To build the RHCOS layer container image with Lustre, you need two specific images unique to your cluster version:
 
-First we need to install Builds for OpenShift to more easily access the entitlement secret that exists in the cluster.
+1. **Driver Toolkit Image**: Contains kernel development packages
+   ```
+   oc adm release info --image-for driver-toolkit
+   ```
+
+2. **RHEL CoreOS Image**: The base OS image
+   ```
+   oc adm release info --image-for rhel-coreos
+   ```
+
+These images are referenced in the [Containerfile](Containerfile) included in this directory.
+
+### Entitlement Requirements
+
+The build requires entitlement to access RHEL repositories beyond what UBI provides. This can be accomplished:
+- On a subscribed RHEL host
+- On an OpenShift cluster (described below)
+
+## Building on OpenShift Cluster
+
+Although we're doing "out-of-cluster layering," we're still building the container image in a cluster. The term refers to how the Machine Config Operator consumes the image, not where it's built.
+
+**Note**: You can build this container image in any environment and host it on any Docker v2-compatible registry.
+
+### Step 1: Install Builds for OpenShift
+
+This provides easier access to the entitlement secret in the cluster:
 
 ```
 oc apply -f install-operator.yaml
 ```
 
-Next we will install the build recipe, this creates the `lustre-build` namespace and sets up our Build.
+### Step 2: Set Up Build Configuration
+
+Create the `lustre-build` namespace and set up the Build:
 
 ```
 oc apply -f build.yaml
 ```
 
-In order to set up the entitlement for the build, we will use a SharedSecret which is installed alongside Builds for OpenShift
+### Step 3: Configure Build Entitlement
+
+Use a SharedSecret which is installed with Builds for OpenShift:
 
 ```
 oc apply -f entitled-build.yaml
 ```
 
-Finally we can kick off a build with BuildRun
+### Step 4: Start the Build
+
+Initiate the build with BuildRun:
+
+```
+oc create -f buildrun.yaml
+```
+
+Alternatively, you can use:
 
 ```
 cat << EOF | oc create -f -
@@ -54,8 +96,28 @@ spec:
 EOF
 ```
 
-Once the build completes (building Lustre client from source takes a minute), then we can apply our MachineConfig to roll out the new image to the worker nodes:
+**Note**: Building the Lustre client from source takes several minutes.
+
+### Step 5: Apply the Machine Configuration
+
+Once the build completes, apply the MachineConfig to roll out the new image to worker nodes:
 
 ```
 oc apply -f machineconfig.yaml
 ```
+
+This will trigger a rolling update of your worker nodes to apply the Lustre kernel modules.
+
+## Verification
+
+After the MachineConfig has been applied and nodes have finished updating, you can verify the Lustre client modules are available:
+
+```
+oc debug node/<worker-node> -- chroot /host modprobe lustre
+```
+
+## Troubleshooting
+
+- Check MachineConfig status: `oc get mcp`
+- View MachineConfig logs: `oc logs -f -n openshift-machine-config-operator <machine-config-daemon-pod>`
+- Inspect node journal: `oc debug node/<node> -- chroot /host journalctl -xeu coreos-layering`
