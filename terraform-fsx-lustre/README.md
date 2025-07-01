@@ -31,6 +31,7 @@ This Terraform project sets up a standalone AWS FSx Lustre file system with all 
    fsx_deployment_type        = "SCRATCH_2"
    fsx_storage_capacity       = 1200
    fsx_per_unit_storage_throughput = 50
+   fsx_lustre_version         = "2.15" # Latest version available (sets file_system_type_version)
    existing_vpc_id            = "vpc-12345678" # Optional, for VPC peering
    ```
 
@@ -61,7 +62,13 @@ This Terraform project sets up a standalone AWS FSx Lustre file system with all 
 - `PERSISTENT_1`: Long-term storage with throughput specified via `per_unit_storage_throughput`
 - `PERSISTENT_2`: Latest generation persistent file system with throughput specified via `per_unit_storage_throughput`
 
-This project configures a standalone FSx Lustre filesystem without any S3 data repository integration. If you need to integrate with an S3 bucket for data import/export, you'll need to add the appropriate configuration parameters.
+## Lustre Version Options (file_system_type_version)
+
+- `2.10`: Original version
+- `2.12`: Improved version with enhanced metadata performance
+- `2.15`: Latest version with the most features and best performance
+
+This project is configured to use Lustre version 2.15 by default (via the `file_system_type_version` parameter). This project configures a standalone FSx Lustre filesystem without any S3 data repository integration. If you need to integrate with an S3 bucket for data import/export, you'll need to add the appropriate configuration parameters.
 
 ## Mounting the FSx Lustre File System
 

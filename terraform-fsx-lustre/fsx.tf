@@ -9,7 +9,8 @@ resource "aws_fsx_lustre_file_system" "lustre" {
   per_unit_storage_throughput = var.fsx_deployment_type == "PERSISTENT_1" || var.fsx_deployment_type == "PERSISTENT_2" ? var.fsx_per_unit_storage_throughput : null
 
   # Additional configuration options
-  storage_type = "SSD"
+  storage_type             = "SSD"
+  file_system_type_version = var.fsx_lustre_version
 
   tags = {
     Name = "${var.project_name}-lustre-fs"

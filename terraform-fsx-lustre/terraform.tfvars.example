@@ -14,6 +14,7 @@ availability_zone  = "us-west-2a"
 fsx_deployment_type           = "SCRATCH_2"
 fsx_storage_capacity          = 1200  # Minimum 1200 GiB
 fsx_per_unit_storage_throughput = 50  # Only used for PERSISTENT deployment types
+fsx_lustre_version            = "2.15"  # Options: 2.10, 2.12, 2.15 (used for file_system_type_version parameter)
 
 # VPC Peering Configuration (Optional)
 # Uncomment and fill in this value to enable VPC peering

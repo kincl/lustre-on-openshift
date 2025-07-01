@@ -46,6 +46,12 @@ variable "fsx_per_unit_storage_throughput" {
   default     = 50
 }
 
+variable "fsx_lustre_version" {
+  description = "The version of the Lustre file system (2.10, 2.12, or 2.15) - used for file_system_type_version parameter"
+  type        = string
+  default     = "2.15"
+}
+
 variable "existing_vpc_id" {
   description = "ID of the existing VPC to peer with"
   type        = string
