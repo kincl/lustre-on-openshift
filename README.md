@@ -14,7 +14,9 @@ and OpenShift's Driver Toolkit image
 
 Cluster layering uses RHCOS layers to deploy the kernel modules for lustre client to the nodes in the node image itself. KMM operator builds the kernel modules in a container and installs them in the live kernel.
 
-Look at either `cluster-layering/` or `kernel-module-management/`
+Cluster layering is preferred in this case.
+
+Look at either [cluster-layering/](cluster-layering/) or [kernel-module-management/](kernel-module-management/)
 
 ## Mutating Webhooks with Open Policy Agent
 
