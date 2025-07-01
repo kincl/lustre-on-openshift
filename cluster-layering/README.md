@@ -14,6 +14,8 @@ On-cluster layering should be possible but I have not yet investigated it.
 
 This example uses **out-of-cluster layering**.
 
+Lustre client build follows upstream [docs](https://wiki.lustre.org/Compiling_Lustre)
+
 ## Prerequisites
 
 - OpenShift Container Platform cluster
@@ -74,6 +76,8 @@ Use a SharedSecret which is installed with Builds for OpenShift:
 ```
 oc apply -f entitled-build.yaml
 ```
+
+[Docs for SharedSecret CSI](https://docs.redhat.com/en/documentation/builds_for_red_hat_openshift/1.4/html/work_with_shared_resources/shared-resource-csi-driver)
 
 ### Step 4: Start the Build
 
